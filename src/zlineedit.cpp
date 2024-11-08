@@ -1,8 +1,11 @@
 #include <sys/ioctl.h>
 #include <termios.h>
 
+#include "config.hpp"
+
 #include <algorithm>
 #include <fstream>
+#include <iostream>
 #include <string>
 #include <vector>
 

@@ -9,14 +9,13 @@
 #include <string>
 
 #include "globals.hpp"
-#include "config.hpp"
 
-#include "syn.cpp"
-#include "vars.cpp"
-#include "list.cpp"
-#include "dispatch.cpp"
-#include "command.cpp"
-#include "zlineedit.cpp"
+// #include "syn.cpp"
+// #include "vars.cpp"
+// #include "list.cpp"
+// #include "dispatch.cpp"
+// #include "command.cpp"
+// #include "zlineedit.cpp"
 
 /** Load a file and evaluate it.
  *

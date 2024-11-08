@@ -1,6 +1,9 @@
 #include <glob.h>
 #include <string.h>
 
+#include "globals.hpp"
+#include "config.hpp"
+
 #include <string>
 #include <vector>
 

@@ -1,10 +1,14 @@
 #include <math.h>
 
+#include "globals.hpp"
+#include "vars.hpp"
+
 #include <iomanip>
 #include <limits>
 #include <sstream>
 #include <string>
 #include <unordered_map>
+#include <iostream>
 
 template<typename T>
 std::string numtos(const T x)
@@ -32,19 +36,6 @@ zrc_num stonum(std::string const& str)
 	} catch (std::exception& ex) {
 		return NAN;
 	}
-}
-
-#define ARR(x) zrc_arr& x = amap[#x];
-#define VAR(x) zrc_obj& x = vmap[#x];
-
-namespace vars
-{
-	std::unordered_map<std::string, zrc_obj> vmap;
-	std::unordered_map<std::string, zrc_arr> amap;
-
-	VAR(status) // Last return value
-	VAR(argc)   // Argument count
-	ARR(argv)   // Argument vector
 }
 
 /** Get a variable's value

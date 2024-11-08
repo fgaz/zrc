@@ -1,11 +1,28 @@
-all: expr
+PREFIX = /usr/local
+CXXFLAGS = -O3 -std=gnu++11
+SRCS := $(shell find src -name *.cpp)
+OBJS := $(subst src/,bin/,$(addsuffix .o,$(basename $(SRCS))))
+
+.PHONY: all
+all: bin/zrc
+
+bin/zrc: $(OBJS)
+	$(CXX) $(OBJS) $(LDFLAGS) -o $@
+
+bin/%.o: src/%.cpp
 	mkdir -p bin
-	$(CXX) -pedantic -std=gnu++11 -Wall -w src/lex.yy.c src/y.tab.c src/main.cpp -o bin/zrc
-	strip bin/zrc
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -c -o $@ $<
+
+src/y.tab.cpp:
+	bison -d src/expr.y -o src/y.tab.cpp
+
+src/lex.yy.cpp:
+	flex -o src/lex.yy.cpp src/expr.l
+
+.PHONY: install
 install:
-	ln -sf $$(pwd) '/usr/lib/zrc'
-expr:
-	bison -d src/expr.y -o src/y.tab.c
-	flex -o src/lex.yy.c src/expr.l
+	install -Dm755 bin/zrc $(DESTDIR)$(PREFIX)/bin/zrc
+
+.PHONY: clean
 clean:
 	rm bin/*

@@ -1,3 +1,5 @@
+#pragma once
+
 /*
  * Global structs, macros, classes and subroutines.
  */
@@ -53,12 +55,92 @@ FLAG_TYPE(redir, ARG(
 	OPTFD_N      = 1 << 6, // 01000000
 ))
 
-class pipeline;
+struct command {
+	std::array<char*, 4096> argv;
+	int argc = 0;
+	command()=default;
+
+	command(command&& cmd)
+	{
+		std::swap(argv, cmd.argv);
+		argc = cmd.argc;
+		cmd.argv = std::array<char*, 4096>();
+		cmd.argc = 0;
+	}
+
+	~command()
+	{
+		for (int i = 0; i < argc; ++i)
+			free(argv[i]);
+	}
+public:
+
+	inline void add_arg(const char *str)
+	{
+		if (argc == argv.size()-1) {
+			std::cerr << "Too many args!\n";
+			return;
+		} else {
+			argv[argc++] = strdup(str);
+		}
+	}
+};
+
+class pipeline
+{
+public:
+	enum ppl_run_mode {
+		AND, OR, NORMAL
+	} rmode = NORMAL;
+	enum ppl_proc_mode {
+		BG, FG
+	} pmode = FG;
+private:
+	inline bool execute_act();
+public:
+	void execute();
+	std::vector<command> cmds;
+
+	inline void add_cmd(command& cmd)
+	{
+		if (cmd.argc)
+			cmds.push_back(std::move(cmd));
+	}
+
+	operator std::string() const
+	{
+		std::string ret;
+		for (size_t i = 0; i < cmds.size(); ++i) {
+			ret += list(cmds[i].argc, const_cast<char**>(cmds[i].argv.data())) + " ";
+			if (i < cmds.size()-1)
+				ret += "| ";
+		}
+		return ret;
+	}
+};
 class return_handler;
 class break_handler;
 class return_handler;
 class return_handler;
-class block_handler;
+class block_handler
+{
+private:
+	bool ok = false, *ref = &in_loop;
+public:
+	block_handler(bool *ref)
+	{
+		this->ref = ref;
+		if (!*ref)
+			ok = true;
+		*ref = true;
+	}
+	~block_handler()
+	{
+		if (ok)
+			*ref = false;
+	}
+};
+
 
 struct substit;
 struct token;

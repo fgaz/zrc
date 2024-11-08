@@ -9,9 +9,13 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "globals.hpp"
+#include "config.hpp"
+
 #include <array>
 #include <functional>
 #include <vector>
+#include <iostream>
 volatile sig_atomic_t chld_notif;
 
 /** Check if a file descriptor is valid
@@ -208,75 +212,12 @@ static inline std::string get_fifo(std::string const& str)
 	}
 }
 
-struct command {
-	std::array<char*, 4096> argv;
-	int argc = 0;
-	command()=default;
-
-	command(command&& cmd)
-	{
-		std::swap(argv, cmd.argv);
-		argc = cmd.argc;
-		cmd.argv = std::array<char*, 4096>();
-		cmd.argc = 0;
-	}
-
-	~command()
-	{
-		for (int i = 0; i < argc; ++i)
-			free(argv[i]);
-	}
-public:
-
-	inline void add_arg(const char *str)
-	{
-		if (argc == argv.size()-1) {
-			std::cerr << "Too many args!\n";
-			return;
-		} else {
-			argv[argc++] = strdup(str);
-		}
-	}
-};
-
 /* Ditto */
 static inline void exec(command& cmd)
 {
 	exec(cmd.argc, cmd.argv.data());
 }
 
-class pipeline
-{
-public:
-	enum ppl_run_mode {
-		AND, OR, NORMAL
-	} rmode = NORMAL;
-	enum ppl_proc_mode {
-		BG, FG
-	} pmode = FG;
-private:
-	inline bool execute_act();
-public:
-	void execute();
-	std::vector<command> cmds;
-
-	inline void add_cmd(command& cmd)
-	{
-		if (cmd.argc)
-			cmds.push_back(std::move(cmd));
-	}
-
-	operator std::string() const
-	{
-		std::string ret;
-		for (size_t i = 0; i < cmds.size(); ++i) {
-			ret += list(cmds[i].argc, const_cast<char**>(cmds[i].argv.data())) + " ";
-			if (i < cmds.size()-1)
-				ret += "| ";
-		}
-		return ret;
-	}
-};
 
 /******************************
  *                            *

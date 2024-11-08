@@ -1,3 +1,6 @@
+#include "globals.hpp"
+#include "config.hpp"
+
 /** Return a list from args.
  *
  * @param {int}argc,{char**}argv

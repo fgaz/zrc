@@ -11,6 +11,10 @@
 #include <unistd.h>
 #include <regex.h>
 
+#include "globals.hpp"
+#include "config.hpp"
+#include "vars.hpp"
+
 #include <functional>
 #include <iostream>
 #include <map>
@@ -89,25 +93,6 @@ EXCEPTION_CLASS(regex)
 bool in_loop;
 bool in_switch;
 bool in_func;
-
-class block_handler
-{
-private:
-	bool ok = false, *ref = &in_loop;
-public:
-	block_handler(bool *ref)
-	{
-		this->ref = ref;
-		if (!*ref)
-			ok = true;
-		*ref = true;
-	}
-	~block_handler()
-	{
-		if (ok)
-			*ref = false;
-	}
-};
 
 static inline std::string concat(int argc, char *argv[], int i)
 {
